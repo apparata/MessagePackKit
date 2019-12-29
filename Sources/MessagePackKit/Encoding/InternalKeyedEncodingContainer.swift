@@ -3,72 +3,64 @@
 //
 
 import Foundation
+    
+internal final class InternalKeyedEncodingContainer<Key> where Key: CodingKey {
 
-internal class InternalKeyedEndcodingContainer<Key> where Key: CodingKey {
+    private var storage: [AnyCodingKey: MessagePackEncodingContainer] = [:]
     
     var codingPath: [CodingKey]
     var userInfo: [CodingUserInfoKey: Any]
-
-    private var storage: [String: MessagePackEncodingContainer] = [:]
-        
+    
     func nestedCodingPath(forKey key: CodingKey) -> [CodingKey] {
-        return self.codingPath + [key]
+        codingPath + [key]
     }
     
-    init(codingPath: [CodingKey], userInfo: [CodingUserInfoKey : Any]) {
+    init(codingPath: [CodingKey], userInfo: [CodingUserInfoKey: Any]) {
         self.codingPath = codingPath
         self.userInfo = userInfo
     }
 }
 
-extension InternalKeyedEndcodingContainer: KeyedEncodingContainerProtocol {
+extension InternalKeyedEncodingContainer: KeyedEncodingContainerProtocol {
     
     func encodeNil(forKey key: Key) throws {
         var container = nestedSingleValueContainer(forKey: key)
         try container.encodeNil()
     }
     
-    func encode<T>(_ value: T, forKey key: Key) throws where T : Encodable {
+    func encode<T>(_ value: T, forKey key: Key) throws where T: Encodable {
         var container = nestedSingleValueContainer(forKey: key)
         try container.encode(value)
     }
     
     private func nestedSingleValueContainer(forKey key: Key) -> SingleValueEncodingContainer {
-        let codingPath = nestedCodingPath(forKey: key)
-        let container = InternalSingleValueEncodingContainer(codingPath: codingPath,
-                                                     userInfo: userInfo)
-        storage[key.stringValue] = container
+        let container = InternalSingleValueEncodingContainer(codingPath: nestedCodingPath(forKey: key), userInfo: userInfo)
+        storage[AnyCodingKey(key)] = container
         return container
     }
     
     func nestedUnkeyedContainer(forKey key: Key) -> UnkeyedEncodingContainer {
-        let codingPath = nestedCodingPath(forKey: key)
-        let container = InternalUnkeyedEncodingContainer(codingPath: codingPath,
-                                                 userInfo: userInfo)
-        storage[key.stringValue] = container
-        
+        let container = InternalUnkeyedEncodingContainer(codingPath: nestedCodingPath(forKey: key), userInfo: userInfo)
+        storage[AnyCodingKey(key)] = container
         return container
     }
     
-    func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
-        let codingPath = nestedCodingPath(forKey: key)
-        let container = InternalKeyedEndcodingContainer<NestedKey>(codingPath: codingPath,
-                                                          userInfo: userInfo)
-        storage[key.stringValue] = container
-        
+    func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
+        let container = InternalKeyedEncodingContainer<NestedKey>(codingPath: nestedCodingPath(forKey: key), userInfo: userInfo)
+        storage[AnyCodingKey(key)] = container
         return KeyedEncodingContainer(container)
     }
     
     func superEncoder() -> Encoder {
-        fatalError("Unimplemented")
+        fatalError("Unimplemented") // FIXME
     }
     
     func superEncoder(forKey key: Key) -> Encoder {
-        fatalError("Unimplemented")
+        fatalError("Unimplemented") // FIXME
     }
 }
 
-extension InternalKeyedEndcodingContainer: MessagePackEncodingContainer {
+extension InternalKeyedEncodingContainer: MessagePackEncodingContainer {
     
     var data: Data {
         var data = Data()
@@ -88,10 +80,9 @@ extension InternalKeyedEndcodingContainer: MessagePackEncodingContainer {
             fatalError()
         }
         
-        for (key, container) in self.storage {
-            let keyContainer = InternalSingleValueEncodingContainer(codingPath: codingPath,
-                                                            userInfo: userInfo)
-            try! keyContainer.encode(key)
+        for (key, container) in storage {
+            let keyContainer = InternalSingleValueEncodingContainer(codingPath: codingPath, userInfo: userInfo)
+            try! keyContainer.encode(key.stringValue)
             data.append(keyContainer.data)
             
             data.append(container.data)

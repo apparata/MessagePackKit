@@ -5,6 +5,7 @@
 import Foundation
 
 internal extension FixedWidthInteger {
+    
     init(bytes: [UInt8]) {
         self = bytes.withUnsafeBufferPointer {
             $0.baseAddress!.withMemoryRebound(to: Self.self, capacity: 1) {

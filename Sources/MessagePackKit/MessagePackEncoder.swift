@@ -4,10 +4,10 @@
 
 import Foundation
 
-// MARK: - MessagePackEncoder
-
 /// Encodes objects and values in the MessagePack format.
 public final class MessagePackEncoder {
+    
+    public var userInfo: [CodingUserInfoKey: Any] = [:]
     
     public init() {
         //
@@ -35,7 +35,17 @@ public final class MessagePackEncoder {
     ///
     public func encode(_ value: Encodable) throws -> Data {
         let encoder = InternalMessagePackEncoder()
-        try value.encode(to: encoder)
+        encoder.userInfo = self.userInfo
+        
+        switch value {
+        case let data as Data:
+            try Box<Data>(data).encode(to: encoder)
+        case let date as Date:
+            try Box<Date>(date).encode(to: encoder)
+        default:
+            try value.encode(to: encoder)
+        }
+        
         return encoder.data
     }
 }

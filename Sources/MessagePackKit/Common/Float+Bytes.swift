@@ -1,5 +1,5 @@
 //
-//  See LICENSE and ATTRIBUTIONS files for copyright and licensing information.
+// See LICENSE and ATTRIBUTIONS files for copyright and licensing information.
 //
 
 import Foundation

@@ -5,5 +5,6 @@
 import Foundation
 
 internal protocol MessagePackEncodingContainer {
+    
     var data: Data { get }
 }
