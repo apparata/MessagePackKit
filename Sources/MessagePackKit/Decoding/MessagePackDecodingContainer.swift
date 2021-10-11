@@ -4,7 +4,7 @@
 
 import Foundation
 
-internal protocol MessagePackDecodingContainer: class {
+internal protocol MessagePackDecodingContainer: AnyObject {
     
     var codingPath: [CodingKey] { get set }
     var userInfo: [CodingUserInfoKey: Any] { get }
