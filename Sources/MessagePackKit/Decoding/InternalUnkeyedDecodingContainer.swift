@@ -171,13 +171,13 @@ extension InternalUnkeyedDecodingContainer {
             length = Int(try read(UInt16.self))
         case 0xc6, 0xc9, 0xdb:
             length = Int(try read(UInt32.self))
-        case 0x80...0x8f:
+        case 0x80...0x8f, 0xde, 0xdf:
             let container = InternalKeyedDecodingContainer<AnyCodingKey>(data: self.data.suffix(from: startIndex), codingPath: nestedCodingPath, userInfo: self.userInfo)
             _ = container.nestedContainers // FIXME
             index = container.index
             
             return container
-        case 0x90...0x9f:
+        case 0x90...0x9f, 0xdc, 0xdd:
             let container = InternalUnkeyedDecodingContainer(data: data.suffix(from: startIndex), codingPath: nestedCodingPath, userInfo: userInfo)
             _ = container.nestedContainers // FIXME
 
