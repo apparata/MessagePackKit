@@ -1,19 +1,14 @@
-// swift-tools-version:5.4
+// swift-tools-version:5.8
 
 import PackageDescription
 
 let package = Package(
     name: "MessagePackKit",
     platforms: [
-        // Relevant platforms.
-        .iOS(.v13), .macOS(.v10_15), .tvOS(.v13)
+        .iOS(.v15), .macOS(.v12), .tvOS(.v15)
     ],
     products: [
         .library(name: "MessagePackKit", targets: ["MessagePackKit"])
-    ],
-    dependencies: [
-        // It's a good thing to keep things relatively
-        // independent, but add any dependencies here.
     ],
     targets: [
         .target(
