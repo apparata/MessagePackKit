@@ -38,3 +38,9 @@ extension AnyCodingKey: Hashable {
         }
     }
 }
+
+extension AnyCodingKey: Comparable {
+    static func < (lhs: AnyCodingKey, rhs: AnyCodingKey) -> Bool {
+        lhs.stringValue < rhs.stringValue
+    }
+}

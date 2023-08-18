@@ -80,7 +80,10 @@ extension InternalKeyedEncodingContainer: MessagePackEncodingContainer {
             fatalError()
         }
         
-        for (key, container) in storage {
+        for key in storage.keys.sorted() {
+            guard let container = storage[key] else {
+                continue
+            }
             let keyContainer = InternalSingleValueEncodingContainer(codingPath: codingPath, userInfo: userInfo)
             try! keyContainer.encode(key.stringValue)
             data.append(keyContainer.data)

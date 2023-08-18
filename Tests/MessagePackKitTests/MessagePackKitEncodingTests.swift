@@ -95,6 +95,16 @@ class MessagePackKitEncodingTests: XCTestCase {
         XCTAssertEqual(value, Data([0x81, 0xA1, 0x31, 0xD6, 0xFF, 0x00, 0x00, 0x00, 0x01]))
     }
 
+    func testEncodeDictionarySortedKeys() {
+        let value = try! encoder.encode(["a": 43, "1": 42])
+        printAsHex(value)
+        XCTAssertEqual(value, Data([0x82, 0xA1, 0x31, 0x2A, 0xA1, 0x61, 0x2B]))
+    }
+    
+    private func printAsHex(_ data: Data) {
+        print(data.map { String(format: "%02X", $0) }.joined(separator: " "))
+    }
+    
     static var allTests = [
         ("testEncodeFalse", testEncodeFalse),
         ("testEncodeTrue", testEncodeTrue),
